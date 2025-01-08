@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 from datasets import load_dataset
-from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
 from sklearn.utils.class_weight import compute_class_weight
@@ -11,7 +10,10 @@ from tqdm import tqdm
 
 # Load the dataset
 dataset = load_dataset("imodels/diabetes-readmission")
-df = pd.DataFrame(dataset['train'])
+
+# Access the training and test sets directly
+df_train = pd.DataFrame(dataset['train'])
+df_test = pd.DataFrame(dataset['test'])
 
 # Select the medication-related columns
 medication_columns = [
@@ -31,12 +33,12 @@ medication_columns = [
     'glyburide-metformin:Down', 'glyburide-metformin:No', 'glyburide-metformin:Steady', 'glyburide-metformin:Up'
 ]
 
-# Extract features and target variable
-X = df[medication_columns]
-y = df['readmitted'].values
+# Extract features and target variable for training and test data
+X_train = df_train[medication_columns]
+y_train = df_train['readmitted'].values
 
-# Train-test split (adjust as needed)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_test = df_test[medication_columns]
+y_test = df_test['readmitted'].values
 
 # Set up the model and the parameter search space for Bayesian optimization
 search_space = {
