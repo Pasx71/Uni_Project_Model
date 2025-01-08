@@ -24,3 +24,17 @@ Test F1 Score: 0.40462712281565344
     accuracy                           0.55     16282
    macro avg       0.55      0.54      0.52     16282
 weighted avg       0.55      0.55      0.53     16282
+
+
+(LinearSVC)
+Best F1-score:  0.35429800610930906
+Best hyperparameters:  OrderedDict({'C': 1.7318324844616484, 'dual': False, 'loss': 'squared_hinge', 'penalty': 'l2'})
+Test F1 Score: 0.35917496443812236
+              precision    recall  f1-score   support
+
+           0       0.56      0.80      0.66     11016
+           1       0.53      0.27      0.36      9337
+
+    accuracy                           0.56     20353
+   macro avg       0.55      0.54      0.51     20353
+weighted avg       0.55      0.56      0.52     20353
