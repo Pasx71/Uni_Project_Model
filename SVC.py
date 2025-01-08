@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from datasets import load_dataset
-from sklearn.svm import SVC
+from sklearn.svm import LinearSVC
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, f1_score
@@ -33,39 +33,39 @@ medication_columns = [
     'glyburide-metformin:Down', 'glyburide-metformin:No', 'glyburide-metformin:Steady', 'glyburide-metformin:Up'
 ]
 
-# Extract features and target variable for training and test data
+# Extract features and target variable
 X_train = df_train[medication_columns]
 y_train = df_train['readmitted'].values
 
 X_test = df_test[medication_columns]
 y_test = df_test['readmitted'].values
 
-# Standardize the data for SVM
+# Standardize the data
 scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
-# Set up the parameter search space for Bayesian optimization
+# Set up Bayesian search space
 search_space = {
-    'C': (0.01, 1000.0, 'log-uniform'),     # Regularization parameter
-    'gamma': (0.0001, 1.0, 'log-uniform'),  # Kernel coefficient for 'rbf'
-    'kernel': ['rbf', 'linear', 'poly'],    # Kernel options
-    'degree': (2, 5)                        # Degree of polynomial kernel
+    'C': (0.01, 1000.0, 'log-uniform'),  # Regularization parameter
+    'loss': ['squared_hinge'],           # Only squared_hinge supports dual=False
+    'penalty': ['l2'],                   # Default penalty (compatible with LinearSVC)
+    'dual': [False]                      # Set to False for better performance
 }
 
-# Define the SVM model
-svm = SVC(random_state=42)
+# Define the LinearSVC model
+model = LinearSVC(max_iter=10000, random_state=42)
 
-# Perform Bayesian optimization using BayesSearchCV with a progress bar
-opt = BayesSearchCV(svm, search_space, n_iter=50, cv=3, n_jobs=-1, verbose=1, scoring='f1')
+# Perform Bayesian optimization
+opt = BayesSearchCV(model, search_space, n_iter=30, cv=3, n_jobs=-1, verbose=1, scoring='f1')
 
-# Loop with tqdm progress bar to simulate the optimization process
-with tqdm(total=50) as pbar:
-    for _ in range(50):  # simulate optimization steps
+# Fit the model with progress bar
+with tqdm(total=30) as pbar:
+    for _ in range(30):
         opt.fit(X_train_scaled, y_train)
-        pbar.update(1)  # Update the progress bar with each step
+        pbar.update(1)
 
-# Print the best score and best parameters found
+# Best parameters and score
 print("Best F1-score: ", opt.best_score_)
 print("Best hyperparameters: ", opt.best_params_)
 
